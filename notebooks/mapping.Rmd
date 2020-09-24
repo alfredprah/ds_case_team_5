@@ -1,0 +1,144 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+library(ggplot2)
+library(ggmap)
+library(tidyverse)
+library(tidyverse)
+library(ggplot2)
+library(zipcode)
+library(tidyverse)
+library(maps)
+library(viridis)
+library(ggthemes)
+
+library(timetk)
+library(lubridate)
+```
+
+
+
+
+```{r}
+library(readr)
+merged_data <- read_csv("../data/merged_data.csv")
+CCs_SNFs <- read_excel("../data/CCs_SNFs.xlsx")
+CCs <- read_excel("../data/CCs.xlsx")
+SNFs <-read_excel("../data/SNFs.xlsx") 
+Episodes <-read_excel("../data/Episodes.xlsx") 
+```
+
+```{r}
+head(merged_data)
+head(CCs)
+```
+```{r}
+google_map_token <- readRDS(file = "D:/Workspace AOT/AoTEXPLORE/Vanderbilt_EDA/data/google_map.rds")
+
+ggmap::register_google(key = google_map_token)
+rm('google_map_token')
+```
+
+
+
+
+
+```{r}
+p <-  qmap()
+
+
+p <- ggmap(get_googlemap(center = c(lon = -99.9018  , lat = 31.9686),
+                    zoom = 6, scale = 4,
+                    maptype ='terrain',
+                    color = 'color'))
+```
+
+```{r}
+p+geom_point(aes(Lon,Lat),data = merged_data)
+```
+
+```{r}
+merged_data %>% group_by(Lat,Lon) %>% summarise(count=n())
+```
+
+
+```{r}
+library(readxl)
+SNFs <- read_excel("data/SNFs.xlsx")
+```
+
+
+
+```{r}
+p+geom_point(aes(Lon,Lat),data = merged_data)
+```
+
+
+
+```{r}
+
+data("zipcode")
+zipcode
+
+test <- merged_data %>% mutate(ProviderPracticeZipCode=as.character(ProviderPracticeZipCode))
+head(merged_data)
+character()
+
+
+merged_zip <- test %>% left_join(zipcode, by = c("ProviderPracticeZipCode" = "zip"))
+
+merged_zip <- merged_zip %>% drop_na(AdmitDate)
+
+merged_zip <- merged_zip %>% mutate(AdmitDate=ymd(AdmitDate))
+
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+p+geom_point(aes(longitude,latitude),data = merged_zip,alpha=.3)
+```
+
+```{r}
+q <- merged_zip %>% filter(month(AdmitDate)==1) %>% geom_point(aes(longitude,latitude))
+
+summary_intake_snff <- merged_zip %>% group_by(AdmitDate,latitude,longitude) %>% summarise(intake=n())
+
+
+
+for (i in 1:12){
+
+}
+```
+
+
+```{r}
+
+quantile(summary_intake_snff$intake)
+
+p+geom_point(aes(longitude,latitude,color=intake),data = summary_intake_snff %>% filter(month(AdmitDate)==2),alpha=.3)+scale_color_gradient2(midpoint=30, low="blue", mid="white",
+                     high="red", space ="Lab" )
+```
+
+
+```{r}
+test_zip %>% ggplot(aes(longitude,latitude))+geom_point(alpha=.3)
+```
+
+
+```{r}
+head(Episodes)
+head(SNFs)
+
+
+```
+
+
+
