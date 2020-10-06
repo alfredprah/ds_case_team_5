@@ -1,7 +1,14 @@
 ---
-title: "R Notebook"
+title: "Mapping SNFs and Episodes"
 output: html_notebook
 ---
+
+# Introduction:
+
+In this number of SNFs and number of cases per month will plotted on the maps. Required packages are loaded below:
+
+
+
 ```{r}
 library(ggplot2)
 library(ggmap)
@@ -13,16 +20,25 @@ library(tidyverse)
 library(maps)
 library(viridis)
 library(ggthemes)
-
+library(readr)
 library(timetk)
 library(lubridate)
+library(maps)
+
+library(gganimate)
+library(gifski)
+library(transformr)
+
+library(readr)
+library(readxl)
+
 ```
 
 
-
+# Import Data:
 
 ```{r}
-library(readr)
+
 merged_data <- read_csv("../data/merged_data.csv")
 CCs_SNFs <- read_excel("../data/CCs_SNFs.xlsx")
 CCs <- read_excel("../data/CCs.xlsx")
@@ -30,10 +46,20 @@ SNFs <-read_excel("../data/SNFs.xlsx")
 Episodes <-read_excel("../data/Episodes.xlsx") 
 ```
 
+
+
+Let's take a look at the datasets:
+
 ```{r}
 head(merged_data)
 head(CCs)
 ```
+
+
+
+
+For initial purpose visualization will be done on googlemaps. Note that to use the chunk below use needs to use their own googlemaps API.
+
 ```{r}
 google_map_token <- readRDS(file = "D:/Workspace AOT/AoTEXPLORE/Vanderbilt_EDA/data/google_map.rds")
 
@@ -55,26 +81,21 @@ p <- ggmap(get_googlemap(center = c(lon = -99.9018  , lat = 31.9686),
                     color = 'color'))
 ```
 
-```{r}
-p+geom_point(aes(Lon,Lat),data = merged_data)
-```
 
-```{r}
-merged_data %>% group_by(Lat,Lon) %>% summarise(count=n())
-```
-
-
-```{r}
-library(readxl)
-SNFs <- read_excel("data/SNFs.xlsx")
-```
-
-
+Plotting locations of CCs:
 
 ```{r}
 p+geom_point(aes(Lon,Lat),data = merged_data)
 ```
 
+
+
+
+
+
+
+
+For SNFs there are no longitudes and latitudes.However, it can be extracted from zipcodes.
 
 
 ```{r}
@@ -97,14 +118,16 @@ merged_zip <- merged_zip %>% mutate(AdmitDate=ymd(AdmitDate))
 ```
 
 
-```{r}
 
-```
 
 
 ```{r}
 p+geom_point(aes(longitude,latitude),data = merged_zip,alpha=.3)
 ```
+
+
+It is noticable that some place have high concetration of SNFs and sparse in other places.
+
 
 ```{r}
 q <- merged_zip %>% filter(month(AdmitDate)==1) %>% geom_point(aes(longitude,latitude))
@@ -113,32 +136,191 @@ summary_intake_snff <- merged_zip %>% group_by(AdmitDate,latitude,longitude) %>%
 
 
 
-for (i in 1:12){
-
-}
 ```
+Groups by counties
 
 
 ```{r}
 
-quantile(summary_intake_snff$intake)
+
 
 p+geom_point(aes(longitude,latitude,color=intake),data = summary_intake_snff %>% filter(month(AdmitDate)==2),alpha=.3)+scale_color_gradient2(midpoint=30, low="blue", mid="white",
                      high="red", space ="Lab" )
 ```
+This plot is for Februrary only.
 
+
+# Mapping by Counties:
+
+Since most analysis for this project was done by counties, plots will be made for counties below:
 
 ```{r}
-test_zip %>% ggplot(aes(longitude,latitude))+geom_point(alpha=.3)
+
+state.md <- map_data('state', 'texas')
+  md <- map_data('county', 'texas')
 ```
 
 
 ```{r}
-head(Episodes)
-head(SNFs)
+get_plot_data <- function(dataframe,state.md,md){
+  mpcPlotData <- dataframe  %>%
+  mutate(subregion=tolower(county))
+
+plotData <- left_join(md, mpcPlotData, by="subregion")
+
+
+return(plotData)
+}
+```
+
+
+
+
+```{r}
+
+
+timeseries_base <- read_csv("../data/timeseries_base.csv")
+
+```
+
+
+
+```{r}
+snf_county <- read_csv("../data/snfs_per_county.csv")
+
+snf_county_plot <- get_plot_data(snf_county,state.md,md)
+
+
+
 
 
 ```
+
+```{r}
+ggplot() + 
+  geom_polygon(data = snf_county_plot , aes(x=long, y = lat, fill=pid, group = group), color="white") + 
+  geom_polygon(data = state.md, aes(x=long, y=lat, group=group), color="black", fill=NA) +
+  coord_fixed(1.3) +
+  scale_fill_gradient(low = "white", high = "red", na.value="white") 
+  
+
+```
+
+
+
+```{r}
+snf_monthly <- read_csv("../data/county_count_monthly.csv")
+
+snf_monthly_plot <- get_plot_data(snf_monthly,state.md,md)
+
+snf_monthly_plot <- snf_monthly_plot %>% mutate(pid = ifelse(pid >= 25, 25, pid),
+                                                episodeid = ifelse(episodeid >= 25, 25, episodeid))
+
+
+
+```
+
+
+Below SNFs are plotted based on monthly cases. The highest value is capped to 25 for visualisation purpose.
+
+```{r}
+baseMap <- ggplot() + 
+  geom_polygon(data = snf_monthly_plot, aes(x=long, y = lat, fill=pid, group = group), color="white") + 
+  geom_polygon(data = state.md, aes(x=long, y=lat, group=group), color="black", fill=NA) +
+  coord_fixed(1.3) +
+  scale_fill_gradient(low = "white", high = "red", na.value="grey80")
+```
+
+
+
+
+```{r}
+upgradedMap <- baseMap +
+  theme_void() +
+  theme(legend.position=c(1.1,.72), legend.text.align=0, plot.title=element_text(hjust=.1, face="bold"), plot.caption=element_text(hjust=0)) 
+
+upgradedMap
+```
+
+
+
+```{r}
+
+
+animatedMap <- upgradedMap +
+  geom_text(data=snf_monthly_plot, aes(x=-102.413507, y=28.340432, label=as.character(month(month))), check_overlap = TRUE, size=10, fontface="bold") +
+  transition_states(month(month), 1, 12)
+
+animatedMap
+```
+
+
+
+
+
+
+
+
+
+```{r}
+mapGIF <- animate(animatedMap) 
+anim_save("../data/gifs/map_snff_montly.gif", animation=mapGIF)
+```
+
+
+Below episodes are plotted based on monthly cases. The highest value is capped to 25 again for visualisation purpose.
+
+```{r}
+baseMap <- ggplot() + 
+  geom_polygon(data = snf_monthly_plot, aes(x=long, y = lat, fill=episodeid, group = group), color="white") + 
+  geom_polygon(data = state.md, aes(x=long, y=lat, group=group), color="black", fill=NA) +
+  coord_fixed(1.3) +
+  scale_fill_gradient(low = "white", high = "red", na.value="grey80")
+```
+
+
+
+
+```{r}
+upgradedMap <- baseMap +
+  theme_void() +
+  theme(legend.position=c(1.1,.72), legend.text.align=0, plot.title=element_text(hjust=.1, face="bold"), plot.caption=element_text(hjust=0)) 
+
+upgradedMap
+```
+
+
+
+
+
+```{r}
+
+
+animatedMap <- upgradedMap +
+  geom_text(data=snf_monthly_plot, aes(x=-102.413507, y=28.340432, label=as.character(month(month))), check_overlap = TRUE, size=10, fontface="bold") +
+  transition_states(month(month), 1, 12)
+
+animatedMap
+```
+
+
+
+
+
+
+
+
+
+```{r}
+mapGIF <- animate(animatedMap) 
+anim_save("../data/gifs/map_episodes_montly.gif", animation=mapGIF)
+```
+
+
+
+
+
+
 
 
 
