@@ -2,16 +2,23 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 
+
+st.set_page_config(
+	page_title = 'Twitter | Content Moderation',
+	page_icon = 'assets/favicon_twitter.ico',
+	initial_sidebar_state = 'expanded'
+
+)
+
 # Pages
 import dashboard
 import tweet_review
 
-
-st.title('Main Page')
+st.title('Twitter Content Moderation')
 
 PAGES = {
-    "Dashboard": dashboard,
-    "Review Tweets": tweet_review
+	"Review Tweets": tweet_review,
+  "Dashboard": dashboard    
 }
 
 st.sidebar.title('Navigation')
