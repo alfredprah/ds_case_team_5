@@ -124,20 +124,33 @@ def update_predictions(df, tweet_info, label):
 
 # app1
 def app():
+	# Define Columns
+	
+
 	# Create random username
 	user = generate_username(1)
 
-	# st.title('APP1')
-	st.write('Is the following Tweet related to a real diaster?')
-	st.write('')
-	
 	# Get tweet info
 	df_tweets = load_predictions()
 	tweet_info = get_tweet(df_tweets)
 	tweet_body = tweet_info['text'].values[0].replace("\n", "<br>")
+	counter = df_tweets.loc[df_tweets['flag'] == 1 & df_tweets['reviewed_target'].isna()].shape[0] -1
 
-	counter = df_tweets.loc[df_tweets['flag'] == 1 & df_tweets['reviewed_target'].isna()].shape[0]
+	st.write('Is the following Tweet related to a real diaster?')
+	
+	if tweet_info['target'].values[0] == 1:
+		predict_val = 'Disaster'
+	else:
+		predict_val = 'Not Disaster'
 
+	predict_pct = int(tweet_info['probability'].values[0] * 100)
+
+	c1, c2 = st.beta_columns(2)
+	c1.write(f'Prediction: {predict_val} ({predict_pct}%)')
+	c2.write(f'Remaining to Review: {counter}')
+	
+	
+	
 	test_html = html_body(user = generate_username(1),
 												tweet_body = tweet_body,
 												tweet_prob = tweet_info['probability'],
