@@ -6,7 +6,7 @@ Recently, there has been a rise in tweets flagged related to an emergency or dis
 Using RoBERTA, we have been able to predict such tweets with 84% accuracy while pushing a small percentage of the predictions we are least confident to manual review via content moderation frontend (powered by Streamlit).
 
 <p align="center">
-  <img src="https://github.com/alfredprah/ds_case_team_5/blob/readme_tweet_prediction/tweet_prediction/dashboard/assets/frontend_screenshot.png" width="550">
+  <img src="https://github.com/alfredprah/ds_case_team_5/blob/master/tweet_prediction/dashboard/assets/frontend_screenshot.png" width="550">
 </p>
 
 ## Setup
