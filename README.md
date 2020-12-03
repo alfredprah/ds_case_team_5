@@ -1,6 +1,5 @@
-# SNF Case Study  - Team 5
-
-DS-5360: Case Studies in Data Science
+# Team 5 | Case Studies in Data Science
+Fall 2020, Vanderbilt MSDS (DS-5360)
 
 This repository contains work for two separate projects as part of DS-5360, Fall 2020. This root directory contains the `requirements.txt` to install any required Python packages.
 
