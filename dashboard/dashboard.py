@@ -8,8 +8,7 @@ import matplotlib.pyplot as plt
 def app():
     st.title('APP2')
     st.write('Dashboard for Review')
-
-@st.cache  
+  
 def load_predictions():
 	return pd.read_csv('../data/case2/dashboard_predictions.csv', index_col='id')
 st.set_option('deprecation.showPyplotGlobalUse', False)
