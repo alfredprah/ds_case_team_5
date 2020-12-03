@@ -25,7 +25,7 @@ def app():
     st.pyplot()
     
     df=data[data['flag']==1]
-    df.loc[:,"reviewed_target"]=np.random.choice([1, 0, 2], df.shape[0])
+    df["reviewed_target"].fillna(2, inplace=True)
     df["reviewed_target"].hist()
     plt.xticks(range(3),["Positive","Negative","Needs Review"])
     plt.show()
