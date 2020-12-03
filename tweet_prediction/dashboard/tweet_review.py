@@ -100,7 +100,7 @@ def html_body(**kwargs):
 
 # Load CSV of Predictions
 def load_predictions():
-	return pd.read_csv('../data/case2/dashboard_predictions.csv', index_col='id')
+	return pd.read_csv('../data/dashboard_predictions.csv', index_col='id')
 
 def get_tweet(df):
 	"""
@@ -117,7 +117,7 @@ def update_predictions(df, tweet_info, label):
 	df_tweets.loc[df_tweets.index.isin(tweet_info.index), ['reviewed_target', 'datetime_review']] = \
 		[label, dt.datetime.now()]
 
-	df_tweets.to_csv('../data/case2/dashboard_predictions.csv')
+	df_tweets.to_csv('../data/dashboard_predictions.csv')
 
 	return load_predictions()
 

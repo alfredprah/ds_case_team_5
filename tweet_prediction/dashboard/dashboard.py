@@ -10,7 +10,7 @@ def app():
     st.write('Dashboard for Review')
   
 def load_predictions():
-	return pd.read_csv('../data/case2/dashboard_predictions.csv', index_col='id')
+	return pd.read_csv('../data/dashboard_predictions.csv', index_col='id')
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 def app():
@@ -19,7 +19,7 @@ def app():
     #histogram
     df = pd.DataFrame(data, columns = ['flag'])
     df.hist()
-    plt.xticks(range(len((0,1))),["Good","Needs Review"])
+    plt.xticks(range(len((0,1))),["Automated","Needs Review"])
     plt.show()
     st.pyplot()
     

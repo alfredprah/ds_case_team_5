@@ -1,4 +1,4 @@
-id,keyword,location,text,probability,target,flag,original_target,datetime_updated
+id,keyword,location,text,probability,target,flag,reviewed_target,datetime_reviewed
 0,,,Just happened a terrible car crash,0.917039633,1,0,,
 2,,,"Heard about #earthquake is different cities, stay safe everyone.",0.959372818,1,0,,
 3,,,"there is a forest fire at spot pond, geese are fleeing across the street, I cannot save them all",0.934049487,1,0,,
